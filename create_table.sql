@@ -130,7 +130,7 @@ CREATE TABLE IF NOT EXISTS Book (
     Book_title VARCHAR(200) NOT NULL,              -- Title of the book
     author VARCHAR(100) NOT NULL,                  -- Author of the book
     publisher VARCHAR(100) NOT NULL,               -- Publisher of the book
-    type VARCHAR(50),                              -- Type of the book (e.g., paperback, hardcover)
+    category VARCHAR(50),                              -- Type of the book (e.g., paperback, hardcover)
     genre VARCHAR(50),                             -- Genre of the book (e.g., fiction, non-fiction)
     date_release DATE NOT NULL,                    -- Release date of the book
     price DECIMAL(10, 2) NOT NULL                  -- Price of the book

@@ -55,8 +55,7 @@ VALUES
 (2, '52', null, 'Ban Pong', 'Sathorn', 'Sathorn', 'Bangkok', '10120');
 
 -- Insert dummy data into Book
--- Insert books into the Book table
-INSERT INTO Book (book_title, author, publisher, type, genre, date_release, price)
+INSERT INTO Book (book_title, author, publisher, category, genre, date_release, price)
 VALUES
 ('Dog Man: The Graphic Novel', 'Dav Pilkey', 'Graphix', 'Hardcover', 'Children''s Fiction', '2024-12-06', 10.49),
 ('Onyx Storm (Deluxe Limited Edition)', 'Tricia Levenseller', 'Entangled: Teen', 'Hardcover', 'Fantasy', '2024-12-05', 19.78),
@@ -65,10 +64,10 @@ VALUES
 ('There''s Treasure Inside', 'Jon Collins', 'Black Gold', 'Paperback', 'Motivational', '2024-11-19', 47.44),
 ('We Who Wrestle with God', 'Richard Rohr', 'Random House', 'Hardcover', 'Religion', '2024-11-12', 23.76),
 ('What Is a Database?', 'John Coder', 'TechPress', 'Paperback', 'Education', '2024-11-03', 27.99),
-('Python Numpy Structures Made Easy', 'A. Data', 'CodeWorld', 'Paperback', 'Education', '2024-11-03', 4.99),
+('Python Numpy Structures Made Database Easy', 'A. Data', 'CodeWorld', 'Paperback', 'Education', '2024-11-02', 4.99),
 ('Vector Databases for AI', 'M. AI Guru', 'AI Publishing', 'Hardcover', 'Education', '2024-11-01', 24.00),
 ('Modern Database Management', 'Jeffrey Hoffer', 'Pearson', 'Hardcover', 'Education', '2002-01-15', 2867.13),
-('A Practical Guide to Relational Database Design', 'Mike Hernandez', 'Database Design Publishing', 'Paperback', 'Education', '2004-02-28', 411.42),
+('A Practical Guide to Relational Database Design', 'Mike Hernandez', 'Database Design Publishing', 'Paperback', 'Education', '2004-02-28', 410.51),
 ('Database Management Systems', 'Raghu Ramakrishnan', 'McGraw-Hill', 'Hardcover', 'Education', '2002-08-12', 188.99),
 ('From Crook to Cook: Platinum Recipes from Tha Boss Dogg''s Kitchen', 'Snoop Dogg', 'Chronicle Books', 'Hardcover', 'Food', '2018-10-23', 13.57),
 ('How To Draw Everything: 300 Drawings of Cute Stuff, Animals, Food, Gifts, and other Amazing Things | Book For Kids', 'Emma Greene', 'Independently published', 'Paperback', 'Art', '2018-11-18', 10.58);
