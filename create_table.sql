@@ -1,9 +1,14 @@
 -- Drop tables in reverse order of dependencies to avoid foreign key conflicts
 DROP TABLE IF EXISTS Restock CASCADE;
 DROP TABLE IF EXISTS Inventory CASCADE;
-DROP TABLE IF EXISTS Order_quantity CASCADE;
+DROP TABLE IF EXISTS Order_quantity_online CASCADE;
+DROP TABLE IF EXISTS Order_quantity_offline CASCADE;
+DROP TABLE IF EXISTS Wishlist CASCADE;
+DROP TABLE IF EXISTS Cart CASCADE;
 DROP TABLE IF EXISTS Book CASCADE;
-DROP TABLE IF EXISTS Purchase_order CASCADE;
+DROP TABLE IF EXISTS Online_order CASCADE;
+DROP TABLE IF EXISTS Offline_order CASCADE;
+DROP TABLE IF EXISTS Address CASCADE;
 DROP TABLE IF EXISTS Customer CASCADE;
 DROP TABLE IF EXISTS Attendance CASCADE;
 DROP TABLE IF EXISTS Schedule CASCADE;
@@ -18,7 +23,7 @@ CREATE TABLE IF NOT EXISTS Branch (
     open_hour TIME NOT NULL,                        -- Branch open time
     close_hour TIME NOT NULL,                       -- Branch close time
     plot VARCHAR(10) NOT NULL,                      -- Plot information (e.g., building number)
-    village VARCHAR(50) NOT NULL,                   -- Village or locality
+    village VARCHAR(50),                            -- Village or locality
     road VARCHAR(50) NOT NULL,                      -- Road or street name
     subdistrict VARCHAR(50) NOT NULL,               -- Subdistrict name
     district VARCHAR(50) NOT NULL,                  -- District name
@@ -69,13 +74,31 @@ CREATE TABLE IF NOT EXISTS Customer (
     customerID SERIAL PRIMARY KEY,                 -- Auto-incremented customer ID
     firstname VARCHAR(50) NOT NULL,                -- Customer's first name
     lastname VARCHAR(50) NOT NULL,                 -- Customer's last name
+    birthday DATE NOT NULL,                        -- Customer's birthdate
+    phone_number VARCHAR(15) NOT NULL,             -- Customer's phone number (optional)
     email VARCHAR(100) NOT NULL,                   -- Customer's email address
-    phone_number VARCHAR(15)                       -- Customer's phone number (optional)
+    password VARCHAR(100) NOT NULL                 -- Customer's password
 );
 
-CREATE TABLE IF NOT EXISTS Purchase_order (
+CREATE TABLE IF NOT EXISTS Address (
+    addressID SERIAL PRIMARY KEY,                   -- Auto-incremented address ID
+    customerID INT NOT NULL,                        -- Customer ID of address
+    plot VARCHAR(10) NOT NULL,                      -- Plot information (e.g., building number)
+    village VARCHAR(50),                            -- Village or locality
+    road VARCHAR(50) NOT NULL,                      -- Road or street name
+    subdistrict VARCHAR(50) NOT NULL,               -- Subdistrict name
+    district VARCHAR(50) NOT NULL,                  -- District name
+    city VARCHAR(50) NOT NULL,                      -- City name
+    postal_code VARCHAR(10) NOT NULL,               -- Postal code for the branch location
+    CONSTRAINT fk_customer FOREIGN KEY (customerID)
+        REFERENCES Customer(customerID)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS Offline_order (
     orderID SERIAL PRIMARY KEY,                    -- Auto-incremented order ID
-    customerID INT,                                -- References the customer placing the order
+    customerID INT NOT NULL,                       -- References the customer placing the order
     branchID INT NOT NULL,                         -- ID of the branch processing the order
     date_purchase DATE NOT NULL,                   -- Date when the order was made
     total_price DECIMAL(10, 2) NOT NULL,           -- Total price of the order
@@ -90,6 +113,18 @@ CREATE TABLE IF NOT EXISTS Purchase_order (
         ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS Online_order (
+    orderID SERIAL PRIMARY KEY,                    -- Auto-incremented order ID
+    customerID INT NOT NULL,                       -- References the customer placing the order
+    date_purchase DATE NOT NULL,                   -- Date when the order was made
+    total_price DECIMAL(10, 2) NOT NULL,           -- Total price of the order
+    payment_method VARCHAR(50) NOT NULL,           -- Payment method used for the order
+    CONSTRAINT fk_customer FOREIGN KEY (customerID)
+        REFERENCES Customer(customerID)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS Book (
     bookID SERIAL PRIMARY KEY,                     -- Auto-incremented book ID
     Book_title VARCHAR(200) NOT NULL,              -- Title of the book
@@ -101,14 +136,63 @@ CREATE TABLE IF NOT EXISTS Book (
     price DECIMAL(10, 2) NOT NULL                  -- Price of the book
 );
 
-CREATE TABLE IF NOT EXISTS Order_quantity (
-    orderID INT,                                   -- ID of the order
-    bookID INT,                                    -- ID of the book being ordered
-    branchID INT,                                  -- ID of the branch fulfilling the order
+CREATE TABLE IF NOT EXISTS Cart (
+    customerID INT NOT NULL,                          -- ID of the order
+    bookID INT NOT NULL,                              -- ID of the book being ordered
+    quantity INT NOT NULL,                            -- Quantity of the book in the order
+    PRIMARY KEY (customerID, bookID),
+    CONSTRAINT fk_customer FOREIGN KEY (customerID)
+        REFERENCES Customer(customerID)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT fk_book FOREIGN KEY (bookID)
+        REFERENCES Book(bookID)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS Wishlist (
+    customerID INT NOT NULL,                          -- ID of the order
+    bookID INT NOT NULL,                              -- ID of the book in the list
+    PRIMARY KEY (customerID, bookID),
+    CONSTRAINT fk_customer FOREIGN KEY (customerID)
+        REFERENCES Customer(customerID)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT fk_book FOREIGN KEY (bookID)
+        REFERENCES Book(bookID)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS Order_quantity_offline (
+    orderID INT NOT NULL,                          -- ID of the order
+    bookID INT NOT NULL,                           -- ID of the book being ordered
+    branchID INT NOT NULL,                         -- ID of the branch fulfilling the order
     quantity INT NOT NULL,                         -- Quantity of the book in the order
     PRIMARY KEY (orderID, bookID),                 -- Composite primary key (orderID, bookID)
     CONSTRAINT fk_order FOREIGN KEY (orderID)
-        REFERENCES Purchase_order(orderID)
+        REFERENCES Offline_order(orderID)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT fk_book FOREIGN KEY (bookID)
+        REFERENCES Book(bookID)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT fk_branch FOREIGN KEY (branchID)
+        REFERENCES Branch(branchID)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS Order_quantity_online (
+    orderID INT NOT NULL,                          -- ID of the order
+    bookID INT NOT NULL,                           -- ID of the book being ordered
+    branchID INT NOT NULL,                         -- ID of the branch fulfilling the order
+    quantity INT NOT NULL,                         -- Quantity of the book in the order
+    PRIMARY KEY (orderID, bookID),                 -- Composite primary key (orderID, bookID)
+    CONSTRAINT fk_order FOREIGN KEY (orderID)
+        REFERENCES Online_order(orderID)
         ON UPDATE CASCADE
         ON DELETE CASCADE,
     CONSTRAINT fk_book FOREIGN KEY (bookID)
@@ -122,8 +206,8 @@ CREATE TABLE IF NOT EXISTS Order_quantity (
 );
 
 CREATE TABLE IF NOT EXISTS Inventory (
-    branchID INT,                                  -- ID of the branch
-    bookID INT,                                    -- ID of the book in the inventory
+    branchID INT NOT NULL,                         -- ID of the branch
+    bookID INT NOT NULL,                           -- ID of the book in the inventory
     quantity INT NOT NULL,                         -- Quantity of the book available in inventory
     PRIMARY KEY (branchID, bookID),                -- Composite primary key (branchID, bookID)
     CONSTRAINT fk_inventory_branch FOREIGN KEY (branchID)
@@ -137,9 +221,17 @@ CREATE TABLE IF NOT EXISTS Inventory (
 );
 
 CREATE TABLE IF NOT EXISTS Restock (
-    branchID INT NOT NULL,
-    bookID INT NOT NULL,
-    quantity INT NOT NULL,         -- Remaining quantity
-    notification_date DATE NOT NULL,
-    PRIMARY KEY (branchID, bookID)
+    branchID INT NOT NULL,                          -- ID of the branch
+    bookID INT NOT NULL,                            -- ID of the book that need to be restocked
+    quantity INT NOT NULL,                          -- Remaining quantity
+    notification_date DATE NOT NULL,                -- Date of notification
+    PRIMARY KEY (branchID, bookID),
+    CONSTRAINT fk_inventory_branch FOREIGN KEY (branchID)
+        REFERENCES Branch(branchID)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT fk_inventory_book FOREIGN KEY (bookID)
+        REFERENCES Book(bookID)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 );
