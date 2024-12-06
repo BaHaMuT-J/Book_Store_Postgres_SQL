@@ -23,6 +23,11 @@ BEGIN
         INSERT INTO cart (customerID, bookID, quantity)
         VALUES (p_customerID, p_bookID, p_quantity);
     END IF;
+
+    -- Remove the book from the wishlist if it exists
+    DELETE FROM wishlist
+    WHERE customerID = p_customerID
+    AND bookID = p_bookID;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -79,6 +84,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trg_update_count_cart ON cart;
 CREATE TRIGGER trg_update_count_cart
     AFTER INSERT OR UPDATE
     ON cart
@@ -98,15 +104,11 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-SELECT * FROM cart;
-SELECT add_to_cart(2, 10, 1);
-SELECT add_to_cart(2, 11, 1);
-SELECT * FROM cart;
+SELECT add_to_cart(3, 10, 1);
+SELECT add_to_cart(3, 11, 1);
 
-SELECT * FROM cart;
-SELECT remove_from_cart(2, 10);
-SELECT * FROM cart;
+SELECT remove_from_cart(3, 10);
 
-SELECT count_cart(2);
+SELECT count_cart(3);
 
-SELECT (view_cart(2)).*;
+SELECT (view_cart(3)).*;

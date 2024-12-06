@@ -2,24 +2,15 @@
 TRUNCATE TABLE restock RESTART IDENTITY CASCADE;
 TRUNCATE TABLE inventory RESTART IDENTITY CASCADE;
 TRUNCATE TABLE order_quantity_online RESTART IDENTITY CASCADE;
-TRUNCATE TABLE order_quantity_offline RESTART IDENTITY CASCADE;
 TRUNCATE TABLE wishlist RESTART IDENTITY CASCADE;
 TRUNCATE TABLE cart RESTART IDENTITY CASCADE;
 TRUNCATE TABLE book RESTART IDENTITY CASCADE;
 TRUNCATE TABLE online_order RESTART IDENTITY CASCADE;
-TRUNCATE TABLE offline_order RESTART IDENTITY CASCADE;
 TRUNCATE TABLE address RESTART IDENTITY CASCADE;
 TRUNCATE TABLE customer RESTART IDENTITY CASCADE;
 TRUNCATE TABLE attendance RESTART IDENTITY CASCADE;
 TRUNCATE TABLE schedule RESTART IDENTITY CASCADE;
 TRUNCATE TABLE employee RESTART IDENTITY CASCADE;
-TRUNCATE TABLE branch RESTART IDENTITY CASCADE;
-
--- Insert dummy data into Branch
-INSERT INTO Branch (branch_name, phone_number, open_hour, close_hour, plot, village, road, subdistrict, district, city, postal_code)
-VALUES
-('Central Bookstore', '021234567', '09:00:00', '21:00:00', '12', 'Chaiyapruek', 'Sukhumvit Road', 'Bang Na', 'Bang Na', 'Bangkok', '10260'),
-('Northside Books', '025678910', '10:00:00', '20:00:00', '55', 'Rim Ping', 'Chiang Mai Road', 'Mueang', 'Chiang Mai', 'Chiang Mai', '50000');
 
 -- Insert dummy data into Employee
 INSERT INTO Employee (firstname, lastname, birthday, role, work_hour, salary, branchID)
@@ -74,28 +65,28 @@ VALUES
 
 
 -- Insert dummy data into Inventory
-INSERT INTO Inventory (branchID, bookID, quantity)
+INSERT INTO Inventory (bookID, quantity)
 VALUES
-(1, 1,  50),     -- Dog Man: The Graphic Novel
-(1, 2,  30),     -- Onyx Storm (Deluxe Limited Edition)
-(1, 3,  20),     -- The Wind of Truth: Book 4 of The Stormlight Archive
-(1, 4,  100),    -- Cher: A Memoir
-(1, 5, 60),      -- There's Treasure Inside
-(1, 6,  40),     -- We Who Wrestle with God
-(2, 7,  35),     -- What Is a Database?
-(2, 8,  25),     -- Python Numpy Structures Made Easy
-(2, 9,  15),     -- Vector Databases for AI
-(2, 10, 3),      -- Modern Database Management
-(2, 11,  11),    -- A Practical Guide to Relational Database Design
-(2, 12,  8),     -- Database Management Systems
-(2, 13, 20),     -- From Crook to Cook: Platinum Recipes from Tha Boss Dogg
-(2, 14, 30);     -- How To Draw Everything: 300 Drawings of Cute Stuff
+(1,  50),     -- Dog Man: The Graphic Novel
+(2,  30),     -- Onyx Storm (Deluxe Limited Edition)
+(3,  20),     -- The Wind of Truth: Book 4 of The Stormlight Archive
+(4,  100),    -- Cher: A Memoir
+(5, 60),      -- There's Treasure Inside
+(6,  40),     -- We Who Wrestle with God
+(7,  35),     -- What Is a Database?
+(8,  25),     -- Python Numpy Structures Made Easy
+(9,  15),     -- Vector Databases for AI
+(10, 3),      -- Modern Database Management
+(11,  11),    -- A Practical Guide to Relational Database Design
+(12,  8),     -- Database Management Systems
+(13, 20),     -- From Crook to Cook: Platinum Recipes from Tha Boss Dogg
+(14, 30);     -- How To Draw Everything: 300 Drawings of Cute Stuff
 
 -- Insert dummy data into Restock
-INSERT INTO Restock (branchID, bookID, quantity, notification_date)
+INSERT INTO Restock (bookID, quantity, notification_date)
 VALUES
-(2, 10, 3, '2023-12-01'),
-(2, 12, 8, '2023-12-02');
+(10, 3, '2023-12-01'),
+(12, 8, '2023-12-02');
 
 -- Insert dummy data into Cart
 INSERT INTO Cart (customerID, bookID, quantity)
@@ -108,15 +99,15 @@ VALUES
 (1, 2);  -- Customer 1 adds "Mastering SQL" to wishlist
 
 -- Insert dummy data into Purchase_order
-INSERT INTO Online_order (customerID, date_purchase, total_price, payment_method)
+INSERT INTO Online_order (customerID, date_purchase, total_price, payment_method, status)
 VALUES
-(1,  '2024-11-01', 25.98, 'Credit card'), -- For multiple books
-(2,  '2024-11-02', 18.57, 'PayPal'),
-(1,  '2024-11-03', 15.58, 'QR code');
+(1,  '2024-11-01', 25.98, 'Credit card', 'Complete'), -- For multiple books
+(1,  '2024-11-02', 18.57, 'PayPal', 'Complete'),
+(1,  '2024-11-03', 15.58, 'QR code', 'Complete');
 
 -- Insert dummy data into Order_quantity
-INSERT INTO order_quantity_online (orderID, bookID, branchID, quantity)
+INSERT INTO order_quantity_online (orderID, bookID, quantity)
 VALUES
-(1, 1, 1, 2),   -- Order 1: 2 copies of "The Great Adventure" from Branch 1
-(2, 13, 2, 1),  -- Order 2: 1 copy of "From Crook to Cook" from Branch 2
-(3, 14, 2, 1);  -- Order 3: 1 copy of "How To Draw Everything" from Branch 2
+(1, 1, 2),   -- Order 1: 2 copies of "The Great Adventure" from Branch 1
+(2, 13, 1),  -- Order 2: 1 copy of "From Crook to Cook" from Branch 2
+(3, 14, 1);  -- Order 3: 1 copy of "How To Draw Everything" from Branch 2
