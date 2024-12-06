@@ -71,7 +71,7 @@ BEGIN
     -- Insert a new order into Online_order
     INSERT INTO Online_order (customerID, date_purchase, total_price, payment_method, addressID, status)
     VALUES (p_customerID, CURRENT_DATE, effective_price,
-            p_payment_method, p_addressID, 'In progress')
+            p_payment_method, p_addressID, 'Pending')
     RETURNING orderID INTO order_id;
 
     -- Insert into Shipping
@@ -141,11 +141,38 @@ CREATE TRIGGER trg_update_restock
     WHEN (OLD.quantity <= 10)   -- Only trigger when quantity is already below 10
     EXECUTE FUNCTION update_restock();
 
+CREATE OR REPLACE FUNCTION update_order_in_progress() RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE online_order
+    SET status = 'In progress'
+    WHERE orderID = NEW.orderID;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_update_order_in_progress ON shipping;
+CREATE TRIGGER trg_update_order_in_progress
+    AFTER UPDATE ON shipping
+    FOR EACH ROW
+    WHEN (NEW.status = 'Shipped')
+    EXECUTE FUNCTION update_order_in_progress();
+
+CREATE OR REPLACE FUNCTION update_order_complete() RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE online_order
+    SET status = 'Complete'
+    WHERE orderID = NEW.orderID;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_update_order_complete ON shipping;
+CREATE TRIGGER trg_update_order_complete
+    AFTER UPDATE ON shipping
+    FOR EACH ROW
+    WHEN (NEW.status = 'Delivered')
+    EXECUTE FUNCTION update_order_complete();
+
 CALL process_order(3, 0, 3, 'Credit card');
-SELECT customerid, firstname, lastname, point FROM customer;
-SELECT * FROM online_order;
-SELECT * FROM shipping;
-SELECT * FROM order_quantity_online;
-SELECT * FROM inventory;
-SELECT * FROM cart;
-SELECT * FROM restock;
+
+Update shipping SET status = 'Delivered' WHERE orderid = 4;

@@ -90,7 +90,7 @@ CREATE TABLE IF NOT EXISTS Online_order (
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
-ALTER TABLE Online_order ADD CONSTRAINT chk_status CHECK (status IN ('In progress', 'Complete', 'Error'));
+ALTER TABLE Online_order ADD CONSTRAINT chk_status CHECK (status IN ('Pending', 'In progress', 'Complete', 'Error'));
 
 CREATE TABLE IF NOT EXISTS Book (
     bookID SERIAL PRIMARY KEY,                     -- Auto-incremented book ID
