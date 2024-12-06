@@ -1,3 +1,6 @@
+-- Function related to cart
+
+-- Add books to Cart
 CREATE OR REPLACE FUNCTION add_to_cart(
     p_customerID INT,  -- Customer ID
     p_bookID INT,      -- Book ID
@@ -31,6 +34,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- Remove books from Cart
 CREATE OR REPLACE FUNCTION remove_from_cart(
     p_customerID INT,  -- Customer ID
     p_bookID INT       -- Book ID
@@ -60,6 +64,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- Update number of books in cart to update number on cart icon in the site
 CREATE OR REPLACE FUNCTION count_cart(
     p_customer_id INT
 )
@@ -74,6 +79,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- Trigger to update number of books in Cart
 CREATE OR REPLACE FUNCTION update_cart_count()
 RETURNS TRIGGER AS
 $$
@@ -84,6 +90,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- Trigger after insert or update in Cart
 DROP TRIGGER IF EXISTS trg_update_count_cart ON cart;
 CREATE TRIGGER trg_update_count_cart
     AFTER INSERT OR UPDATE
@@ -91,6 +98,7 @@ CREATE TRIGGER trg_update_count_cart
     FOR EACH ROW
     EXECUTE FUNCTION update_cart_count();
 
+-- View customer's own Cart
 CREATE OR REPLACE FUNCTION view_cart(
     p_customer_id INT
 )
@@ -104,11 +112,11 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-SELECT add_to_cart(3, 10, 1);
-SELECT add_to_cart(3, 11, 3);
+-- SELECT add_to_cart(3, 10, 1);
+-- SELECT add_to_cart(3, 11, 3);
 
-SELECT remove_from_cart(3, 11);
+-- SELECT remove_from_cart(3, 11);
 
-SELECT count_cart(3);
+-- SELECT count_cart(3);
 
-SELECT (view_cart(3)).*;
+-- SELECT (view_cart(3)).*;

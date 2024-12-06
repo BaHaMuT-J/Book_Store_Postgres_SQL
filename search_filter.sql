@@ -1,3 +1,4 @@
+-- Search and Filter Function
 CREATE OR REPLACE FUNCTION search(
     keyword VARCHAR DEFAULT NULL,               -- Search keyword for book title (or part of title)
     author_filter VARCHAR DEFAULT NULL,         -- Filter for author
@@ -47,11 +48,11 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-
-SELECT (search('database')).*;
+-- Search for books containing 'database' with case-insensitive in the title
+-- SELECT (search('database')).*;
 
 -- Search for books containing 'database' in the title, with a price greater or equal to 100, sorted by price in descending order.
-SELECT (search('database',NULL,NULL,
-               NULL,NULL,NULL,
-               NULL,100,NULL,'price',
-               NULL)).*;
+-- SELECT (search('database',NULL,NULL,
+--                NULL,NULL,NULL,
+--                NULL,100,NULL,'price',
+--                NULL)).*;

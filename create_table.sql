@@ -9,43 +9,8 @@ DROP TABLE IF EXISTS Book CASCADE;
 DROP TABLE IF EXISTS Online_order CASCADE;
 DROP TABLE IF EXISTS Address CASCADE;
 DROP TABLE IF EXISTS Customer CASCADE;
-DROP TABLE IF EXISTS Attendance CASCADE;
-DROP TABLE IF EXISTS Schedule CASCADE;
-DROP TABLE IF EXISTS Employee CASCADE;
 
-CREATE TABLE IF NOT EXISTS Employee (
-    employeeID SERIAL PRIMARY KEY,                 -- Auto-incremented employee ID
-    firstname VARCHAR(50) NOT NULL,                -- Employee's first name
-    lastname VARCHAR(50) NOT NULL,                 -- Employee's last name
-    birthday DATE NOT NULL,                        -- Employee's birthdate
-    role VARCHAR(50) NOT NULL,                     -- Role of the employee (e.g., cashier, manager)
-    work_hour INT NOT NULL,                        -- Number of work hours per week
-    salary DECIMAL(10, 2) NOT NULL                -- Employee's salary (with two decimal points)
-);
-
-CREATE TABLE IF NOT EXISTS Schedule (
-    employeeID INT NOT NULL,                       -- References the employee assigned to the schedule
-    day VARCHAR(9) NOT NULL,                       -- Day of the week (e.g., 'Monday', 'Tuesday', etc.)
-    start_hour TIME NOT NULL,                      -- Shift start time
-    end_hour TIME NOT NULL,                        -- Shift end time
-    PRIMARY KEY (employeeID, day),
-    CONSTRAINT fk_employeeID FOREIGN KEY (employeeID)
-        REFERENCES Employee(employeeID)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS Attendance (
-    employeeID INT NOT NULL,                       -- References the employee attendance
-    attendance_date DATE NOT NULL,                 -- Date of attendance
-    start_time TIME NOT NULL,                      -- When employee arrives
-    end_time TIME NOT NULL,                        -- When employee leaves
-    PRIMARY KEY (employeeID, attendance_date),
-    CONSTRAINT fk_employee FOREIGN KEY (employeeID)
-        REFERENCES Employee(employeeID)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-);
+-- Create tables
 
 CREATE TABLE IF NOT EXISTS Customer (
     customerID SERIAL PRIMARY KEY,                 -- Auto-incremented customer ID

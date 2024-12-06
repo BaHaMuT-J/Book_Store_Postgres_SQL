@@ -1,8 +1,11 @@
+-- Function related to order
+
+-- Process order
 CREATE OR REPLACE PROCEDURE process_order(
-    p_customerID INT,
-    p_point INT,
-    p_addressID INT,
-    p_payment_method VARCHAR(50)
+    p_customerID INT,                   -- Customer's ID
+    p_point INT,                        -- Points customer want to use
+    p_addressID INT,                    -- Address for this order
+    p_payment_method VARCHAR(50)        -- Payment method customer chose
 )
 LANGUAGE plpgsql
 AS $$
@@ -96,9 +99,12 @@ BEGIN
 
     -- Clear the customer's cart
     DELETE FROM Cart WHERE customerID = p_customerID;
+
+    -- Assume customer proceed with their payment in the external site
 END;
 $$;
 
+-- Trigger to notify that the book's quantity drop below threshold and need to be restocked
 CREATE OR REPLACE FUNCTION notify_restock() RETURNS TRIGGER AS $$
 BEGIN
     INSERT INTO restock (bookID, quantity, notification_date)
@@ -107,7 +113,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Create a trigger for the Inventory table
+-- Trigger when update Inventory
 DROP TRIGGER IF EXISTS trg_inventory_threshold ON inventory;
 CREATE TRIGGER trg_inventory_threshold
     AFTER UPDATE ON Inventory
@@ -115,7 +121,7 @@ CREATE TRIGGER trg_inventory_threshold
     WHEN (OLD.quantity > 10 AND NEW.quantity <= 10)   -- Only trigger when quantity drops below 10
     EXECUTE FUNCTION notify_restock();
 
--- Function to update Restock table when the corresponding entry is updated in Inventory table
+-- Trigger to update Restock when the corresponding entry is updated in Inventory
 CREATE OR REPLACE FUNCTION update_restock() RETURNS TRIGGER AS $$
 BEGIN
     IF New.quantity <= 10 THEN
@@ -133,7 +139,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Create a trigger for the Inventory table
+-- Trigger when update Inventory
 DROP TRIGGER IF EXISTS trg_update_restock ON inventory;
 CREATE TRIGGER trg_update_restock
     AFTER UPDATE ON Inventory
@@ -141,6 +147,7 @@ CREATE TRIGGER trg_update_restock
     WHEN (OLD.quantity <= 10)   -- Only trigger when quantity is already below 10
     EXECUTE FUNCTION update_restock();
 
+-- Trigger to update order status after the order are shipped
 CREATE OR REPLACE FUNCTION update_order_in_progress() RETURNS TRIGGER AS $$
 BEGIN
     UPDATE online_order
@@ -150,6 +157,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- Trigger when order are shipped
 DROP TRIGGER IF EXISTS trg_update_order_in_progress ON shipping;
 CREATE TRIGGER trg_update_order_in_progress
     AFTER UPDATE ON shipping
@@ -157,6 +165,7 @@ CREATE TRIGGER trg_update_order_in_progress
     WHEN (NEW.status = 'Shipped')
     EXECUTE FUNCTION update_order_in_progress();
 
+-- Trigger to update order status after the order are delivered
 CREATE OR REPLACE FUNCTION update_order_complete() RETURNS TRIGGER AS $$
 BEGIN
     UPDATE online_order
@@ -166,6 +175,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- Trigger when order are delivered
 DROP TRIGGER IF EXISTS trg_update_order_complete ON shipping;
 CREATE TRIGGER trg_update_order_complete
     AFTER UPDATE ON shipping
@@ -173,6 +183,7 @@ CREATE TRIGGER trg_update_order_complete
     WHEN (NEW.status = 'Delivered')
     EXECUTE FUNCTION update_order_complete();
 
-CALL process_order(3, 0, 3, 'Credit card');
+-- CALL process_order(3, 0, 3, 'Credit card');
 
-Update shipping SET status = 'Delivered' WHERE orderid = 4;
+-- Update shipping SET status = 'Shipped' WHERE orderid = 4;
+-- Update shipping SET status = 'Delivered' WHERE orderid = 4;

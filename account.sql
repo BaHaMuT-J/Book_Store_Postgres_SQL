@@ -1,3 +1,6 @@
+-- Function related to Customer's account
+
+-- Register new customer
 CREATE OR REPLACE FUNCTION register(
     p_firstname VARCHAR(50),          -- Customer's first name
     p_lastname VARCHAR(50),           -- Customer's last name
@@ -37,14 +40,14 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-SELECT register('Siranut', 'Jongdee',
-                '2004-01-30', '0861234567',
-                'siranut.jon@student.mahidol.edu',
-                'Mahidol648');
-SELECT * FROM customer;
+-- SELECT register('Siranut', 'Jongdee',
+--                 '2004-01-30', '0861234567',
+--                 'siranut.jon@student.mahidol.edu',
+--                 'Mahidol648');
 
 -- ****************************************************************************************************************** --
 
+-- Log in
 CREATE OR REPLACE FUNCTION login(
     p_email VARCHAR(100),              -- Customer's email
     p_password VARCHAR(100)            -- Customer's password
@@ -66,11 +69,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-SELECT login('siranut.jon@student.mahidol.edu',
-             'Mahidol648');
+-- SELECT login('siranut.jon@student.mahidol.edu',
+--              'Mahidol648');
 
 -- ****************************************************************************************************************** --
 
+-- Edit personal information of customer
 CREATE OR REPLACE FUNCTION edit_info(
     customer_id INT,                           -- Customer ID to identify the user
     new_firstname VARCHAR(50) DEFAULT NULL,    -- New first name
@@ -108,14 +112,14 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-SELECT edit_info(1, 'Hello',
-                 'World',
-                 '0123456789',
-                 'helloWorld@gmail.com');
-SELECT * FROM customer;
+-- SELECT edit_info(1, 'Hello',
+--                  'World',
+--                  '0123456789',
+--                  'helloWorld@gmail.com');
 
 -- ****************************************************************************************************************** --
 
+-- View customer's order history
 CREATE OR REPLACE FUNCTION view_order_history(customer_id INT)
 RETURNS TABLE(
     order_id INT,
@@ -137,10 +141,11 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-SELECT (view_order_history(3)).*;
+-- SELECT (view_order_history(3)).*;
 
 -- ****************************************************************************************************************** --
 
+-- Add books to customer's wishlist
 CREATE OR REPLACE FUNCTION add_to_wishlist(
     customer_id INT,
     book_id INT)
@@ -152,17 +157,17 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- Remove books from customer's wishlist
 CREATE OR REPLACE FUNCTION remove_from_wishlist(customer_id INT, book_id INT)
 RETURNS VOID AS
 $$
 BEGIN
-    -- Attempt to delete the book from the wishlist
     DELETE FROM Wishlist
     WHERE customerID = customer_id AND bookID = book_id;
 END;
 $$ LANGUAGE plpgsql;
 
-DROP FUNCTION view_wishlist(customer_id INT);
+-- View customer's own wishlist
 CREATE OR REPLACE FUNCTION view_wishlist(customer_id INT)
 RETURNS TABLE(
     book_id INT,
@@ -182,19 +187,20 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-SELECT add_to_wishlist(3, 1);
-SELECT add_to_wishlist(3, 2);
+-- SELECT add_to_wishlist(3, 1);
+-- SELECT add_to_wishlist(3, 2);
 
-SELECT remove_from_wishlist(3, 2);
+-- SELECT remove_from_wishlist(3, 2);
 
-SELECT (view_wishlist(3)).*;
+-- SELECT (view_wishlist(3)).*;
 
 -- ****************************************************************************************************************** --
 
+-- Add address, don't have to necessarily be new (customer can have multiple same address if they want)
 CREATE OR REPLACE FUNCTION add_to_address(
     p_customerID INT,                       -- Customer ID
     p_plot VARCHAR(10),                     -- Plot information
-    p_village VARCHAR(50),     -- Village or locality
+    p_village VARCHAR(50),                  -- Village or locality
     p_road VARCHAR(50),                     -- Road or street name
     p_subdistrict VARCHAR(50),              -- Subdistrict name
     p_district VARCHAR(50),                 -- District name
@@ -208,12 +214,12 @@ BEGIN
         customerID, plot, village, road, subdistrict, district, city, postal_code
     )
     VALUES (
-        p_customerID, p_plot, p_village, p_road,
-            p_subdistrict, p_district, p_city, p_postal_code
+        p_customerID, p_plot, p_village, p_road,p_subdistrict, p_district, p_city, p_postal_code
     );
 END;
 $$ LANGUAGE plpgsql;
 
+-- Remove address
 CREATE OR REPLACE FUNCTION remove_address(
     p_customerID INT,   -- Customer ID
     p_addressID INT     -- Address ID to remove
@@ -223,16 +229,10 @@ $$
 BEGIN
     DELETE FROM Address
     WHERE customerID = p_customerID AND addressID = p_addressID;
-
-    -- Optional: Raise a notice for confirmation
-    IF FOUND THEN
-        RAISE NOTICE 'Address % removed for customer %', p_addressID, p_customerID;
-    ELSE
-        RAISE NOTICE 'Address % does not exist for customer %', p_addressID, p_customerID;
-    END IF;
 END;
 $$ LANGUAGE plpgsql;
 
+-- View customer's own address
 CREATE OR REPLACE FUNCTION view_address(
     p_customerID INT  -- Customer ID
 )
@@ -255,17 +255,18 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-SELECT add_to_address(3, '999',
-                      NULL, 'Phuttamonthon 4',
-                      'Phuttamonthon', 'Salaya',
-                      'Nakhon Pathom', '73170');
+-- SELECT add_to_address(3, '999',
+--                       NULL, 'Phuttamonthon 4',
+--                       'Phuttamonthon', 'Salaya',
+--                       'Nakhon Pathom', '73170');
 
-SELECT remove_address(3, 3);
+-- SELECT remove_address(3, 3);
 
-SELECT (view_address(3)).*;
+-- SELECT (view_address(3)).*;
 
 -- ****************************************************************************************************************** --
 
+-- Delete customer's own account
 CREATE OR REPLACE FUNCTION delete_account(customer_id INT)
 RETURNS VOID AS
 $$
@@ -275,15 +276,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-SELECT * FROM customer;
-SELECT delete_account(3);
-SELECT * FROM customer;
-
-SELECT register('Siranut', 'Jongdee',
-                '2004-01-30', '0861234567',
-                'siranut.jon@student.mahidol.edu',
-                'Mahidol648');
-SELECT add_to_address(3, '999',
-                      NULL, 'Phuttamonthon 4',
-                      'Phuttamonthon', 'Salaya',
-                      'Nakhon Pathom', '73170');
+-- SELECT * FROM customer;
+-- SELECT delete_account(3);
+-- SELECT * FROM customer;
