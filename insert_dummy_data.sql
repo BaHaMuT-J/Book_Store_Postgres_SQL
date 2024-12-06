@@ -13,11 +13,11 @@ TRUNCATE TABLE schedule RESTART IDENTITY CASCADE;
 TRUNCATE TABLE employee RESTART IDENTITY CASCADE;
 
 -- Insert dummy data into Employee
-INSERT INTO Employee (firstname, lastname, birthday, role, work_hour, salary, branchID)
+INSERT INTO Employee (firstname, lastname, birthday, role, work_hour, salary)
 VALUES
-('Somchai', 'Prasert', '1990-02-15', 'Manager', 40, 30000.00, 1),
-('Suda', 'Chaiyawat', '1995-05-12', 'Cashier', 30, 18000.00, 1),
-('Manop', 'Wichai', '1988-07-20', 'Stock Keeper', 35, 20000.00, 2);
+('Somchai', 'Prasert', '1990-02-15', 'Manager', 40, 30000.00),
+('Suda', 'Chaiyawat', '1995-05-12', 'Cashier', 30, 18000.00),
+('Manop', 'Wichai', '1988-07-20', 'Stock Keeper', 35, 20000.00);
 
 -- Insert dummy data into Schedule
 INSERT INTO Schedule (employeeID, day, start_hour, end_hour)
@@ -85,8 +85,8 @@ VALUES
 -- Insert dummy data into Restock
 INSERT INTO Restock (bookID, quantity, notification_date)
 VALUES
-(10, 3, '2023-12-01'),
-(12, 8, '2023-12-02');
+(10, 3, '2024-12-01'),
+(12, 8, '2024-12-02');
 
 -- Insert dummy data into Cart
 INSERT INTO Cart (customerID, bookID, quantity)
@@ -99,14 +99,14 @@ VALUES
 (1, 2);  -- Customer 1 adds "Mastering SQL" to wishlist
 
 -- Insert dummy data into Purchase_order
-INSERT INTO Online_order (customerID, date_purchase, total_price, payment_method, status)
+INSERT INTO Online_order (customerID, date_purchase, total_price, payment_method, addressid, status)
 VALUES
-(1,  '2024-11-01', 25.98, 'Credit card', 'Complete'), -- For multiple books
-(1,  '2024-11-02', 18.57, 'PayPal', 'Complete'),
-(1,  '2024-11-03', 15.58, 'QR code', 'Complete');
+(1,  '2024-11-01', 25.98, 'Credit card', 1, 'Complete'), -- For multiple books
+(1,  '2024-11-02', 18.57, 'PayPal', 1,'Complete'),
+(1,  '2024-11-03', 15.58, 'QR code', 1,'Complete');
 
 -- Insert dummy data into Order_quantity
-INSERT INTO order_quantity_online (orderID, bookID, quantity)
+INSERT INTO Order_quantity_online (orderID, bookID, quantity)
 VALUES
 (1, 1, 2),   -- Order 1: 2 copies of "The Great Adventure" from Branch 1
 (2, 13, 1),  -- Order 2: 1 copy of "From Crook to Cook" from Branch 2

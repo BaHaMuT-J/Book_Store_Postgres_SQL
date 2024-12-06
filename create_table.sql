@@ -1,4 +1,5 @@
 -- Drop tables in reverse order of dependencies to avoid foreign key conflicts
+DROP TABLE IF EXISTS Shipping CASCADE;
 DROP TABLE IF EXISTS Restock CASCADE;
 DROP TABLE IF EXISTS Inventory CASCADE;
 DROP TABLE IF EXISTS Order_quantity_online CASCADE;
@@ -56,6 +57,9 @@ CREATE TABLE IF NOT EXISTS Customer (
     password VARCHAR(100) NOT NULL,                -- Customer's password
     point INT NOT NULL                             -- Customer's points
 );
+ALTER TABLE Customer ADD CONSTRAINT chk_phone_number CHECK (phone_number ~ '^\d{10,15}$');
+ALTER TABLE Customer ADD CONSTRAINT chk_email_format CHECK (email ~ '^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+ALTER TABLE Customer ADD CONSTRAINT chk_points CHECK (point >= 0);
 
 CREATE TABLE IF NOT EXISTS Address (
     addressID SERIAL PRIMARY KEY,                   -- Auto-incremented address ID
@@ -79,12 +83,14 @@ CREATE TABLE IF NOT EXISTS Online_order (
     date_purchase DATE NOT NULL,                   -- Date when the order was made
     total_price DECIMAL(10, 2) NOT NULL,           -- Total price of the order
     payment_method VARCHAR(50) NOT NULL,           -- Payment method used for the order
+    addressID INT NOT NULL,                        -- Address ID of customer for this order
     status VARCHAR(50) NOT NULL,                   -- Status of order (In progress, Complete, Error)
     CONSTRAINT fk_customer FOREIGN KEY (customerID)
         REFERENCES Customer(customerID)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
+ALTER TABLE Online_order ADD CONSTRAINT chk_status CHECK (status IN ('In progress', 'Complete', 'Error'));
 
 CREATE TABLE IF NOT EXISTS Book (
     bookID SERIAL PRIMARY KEY,                     -- Auto-incremented book ID
@@ -96,6 +102,7 @@ CREATE TABLE IF NOT EXISTS Book (
     date_release DATE NOT NULL,                    -- Release date of the book
     price DECIMAL(10, 2) NOT NULL                  -- Price of the book
 );
+ALTER TABLE Book ADD CONSTRAINT chk_price CHECK (price >= 0);
 
 CREATE TABLE IF NOT EXISTS Cart (
     customerID INT NOT NULL,                          -- ID of the order
@@ -111,6 +118,7 @@ CREATE TABLE IF NOT EXISTS Cart (
         ON UPDATE CASCADE
         ON DELETE CASCADE
 );
+ALTER TABLE Cart ADD CONSTRAINT chk_cart_quantity CHECK (quantity > 0);
 
 CREATE TABLE IF NOT EXISTS Wishlist (
     customerID INT NOT NULL,                          -- ID of the order
@@ -140,6 +148,7 @@ CREATE TABLE IF NOT EXISTS Order_quantity_online (
         ON UPDATE CASCADE
         ON DELETE CASCADE
 );
+ALTER TABLE Order_quantity_online ADD CONSTRAINT chk_order_quantity CHECK (quantity > 0);
 
 CREATE TABLE IF NOT EXISTS Inventory (
     bookID INT NOT NULL PRIMARY KEY,               -- ID of the book in the inventory
@@ -149,6 +158,7 @@ CREATE TABLE IF NOT EXISTS Inventory (
         ON UPDATE CASCADE
         ON DELETE CASCADE
 );
+ALTER TABLE Inventory ADD CONSTRAINT chk_inventory_quantity CHECK (quantity >= 0);
 
 CREATE TABLE IF NOT EXISTS Restock (
     bookID INT NOT NULL PRIMARY KEY,                -- ID of the book that need to be restocked
@@ -159,3 +169,13 @@ CREATE TABLE IF NOT EXISTS Restock (
         ON UPDATE CASCADE
         ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS Shipping (
+    orderID INT NOT NULL PRIMARY KEY,
+    status VARCHAR(50) NOT NULL,
+    CONSTRAINT fk_order FOREIGN KEY (orderID)
+        REFERENCES Online_order(orderID)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+);
+ALTER TABLE Shipping ADD CONSTRAINT chk_shipping_status CHECK (status IN ('Pending', 'Shipped', 'Delivered', 'Cancelled'));

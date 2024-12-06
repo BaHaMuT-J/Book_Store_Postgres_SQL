@@ -33,7 +33,7 @@ $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION remove_from_cart(
     p_customerID INT,  -- Customer ID
-    p_bookID INT      -- Book ID
+    p_bookID INT       -- Book ID
 )
 RETURNS VOID AS
 $$
@@ -105,9 +105,9 @@ END;
 $$ LANGUAGE plpgsql;
 
 SELECT add_to_cart(3, 10, 1);
-SELECT add_to_cart(3, 11, 1);
+SELECT add_to_cart(3, 11, 3);
 
-SELECT remove_from_cart(3, 10);
+SELECT remove_from_cart(3, 11);
 
 SELECT count_cart(3);
 

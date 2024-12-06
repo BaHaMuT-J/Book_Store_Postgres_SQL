@@ -137,7 +137,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-SELECT (view_order_history(1)).*;
+SELECT (view_order_history(3)).*;
 
 -- ****************************************************************************************************************** --
 
@@ -264,7 +264,7 @@ SELECT remove_address(3, 3);
 
 SELECT (view_address(3)).*;
 
-
+-- ****************************************************************************************************************** --
 
 CREATE OR REPLACE FUNCTION delete_account(customer_id INT)
 RETURNS VOID AS
@@ -278,3 +278,12 @@ $$ LANGUAGE plpgsql;
 SELECT * FROM customer;
 SELECT delete_account(3);
 SELECT * FROM customer;
+
+SELECT register('Siranut', 'Jongdee',
+                '2004-01-30', '0861234567',
+                'siranut.jon@student.mahidol.edu',
+                'Mahidol648');
+SELECT add_to_address(3, '999',
+                      NULL, 'Phuttamonthon 4',
+                      'Phuttamonthon', 'Salaya',
+                      'Nakhon Pathom', '73170');
