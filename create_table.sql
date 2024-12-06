@@ -77,7 +77,8 @@ CREATE TABLE IF NOT EXISTS Customer (
     birthday DATE NOT NULL,                        -- Customer's birthdate
     phone_number VARCHAR(15) NOT NULL,             -- Customer's phone number (optional)
     email VARCHAR(100) NOT NULL,                   -- Customer's email address
-    password VARCHAR(100) NOT NULL                 -- Customer's password
+    password VARCHAR(100) NOT NULL,                -- Customer's password
+    point INT NOT NULL                             -- Customer's points
 );
 
 CREATE TABLE IF NOT EXISTS Address (

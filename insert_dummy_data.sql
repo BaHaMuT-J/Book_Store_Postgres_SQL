@@ -43,10 +43,10 @@ VALUES
 (3, '2024-12-01', '10:00:00', '18:00:00');
 
 -- Insert dummy data into Customer
-INSERT INTO Customer (firstname, lastname, birthday, phone_number, email, password)
+INSERT INTO Customer (firstname, lastname, birthday, phone_number, email, password, point)
 VALUES
-('Nithya', 'Tharinee', '2000-01-01', '0891234567', 'nithya@gmail.com', 'securepass1'),
-('Pranee', 'Wirachai', '1998-12-12', '0869876543', 'pranee@gmail.com', 'securepass2');
+('Nithya', 'Tharinee', '2000-01-01', '0891234567', 'nithya@gmail.com', 'securepass1', 20),
+('Pranee', 'Wirachai', '1998-12-12', '0869876543', 'pranee@gmail.com', 'securepass2', 50);
 
 -- Insert dummy data into Address
 INSERT INTO Address (customerID, plot, village, road, subdistrict, district, city, postal_code)
@@ -100,14 +100,12 @@ VALUES
 -- Insert dummy data into Cart
 INSERT INTO Cart (customerID, bookID, quantity)
 VALUES
-(1, 11, 2),  -- Customer 1 adds 2 copies of "The Great Adventure"
-(2, 5, 1);  -- Customer 2 adds 1 copy of "Mastering SQL"
+(1, 11, 2);  -- Customer 1 adds 2 copies of "The Great Adventure"
 
 -- Insert dummy data into Wishlist
 INSERT INTO Wishlist (customerID, bookID)
 VALUES
-(1, 2),  -- Customer 1 adds "Mastering SQL" to wishlist
-(2, 10);  -- Customer 2 adds "The Great Adventure" to wishlist
+(1, 2);  -- Customer 1 adds "Mastering SQL" to wishlist
 
 -- Insert dummy data into Purchase_order
 INSERT INTO Online_order (customerID, date_purchase, total_price, payment_method)
